@@ -1,0 +1,29 @@
+<!-- Step 1: GitHub Pagesに置くindex.html のひな形 -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ゼミ順路表示</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 2em; }
+    h1 { font-size: 1.5em; margin-bottom: 1em; }
+    .route { font-size: 2em; font-weight: bold; margin-top: 2em; }
+    button { font-size: 1em; padding: 0.5em 1em; margin-top: 1em; }
+  </style>
+</head>
+<body>
+  <h1>ゼミ発表順路</h1>
+  <div id="routeDisplay">順路を取得しています...</div>
+
+  <!-- zemi-worker用にURLを差し替えたHTML -->
+    <script>
+        async function fetchRoute() {
+        const res = await fetch("https://zemi-worker.u640186g.workers.dev/api/route");
+        const data = await res.json();
+        document.getElementById("routeDisplay").innerText = `あなたの順路：\n${data.route.join(" → ")}`;
+        }
+        fetchRoute();
+    </script>
+</body>
+</html>

@@ -1,78 +1,53 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>ゼミ発表順路と投票</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { font-family: sans-serif; padding: 20px; }
-    .section { margin-bottom: 30px; }
-    button { font-size: 20px; padding: 10px; margin: 5px; }
-    #results span { display: block; font-size: 18px; }
-    #message { color: green; margin-top: 10px; }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ゼミ発表順路</title>
 </head>
 <body>
-  <div class="section">
-    <h2>ゼミ発表順路</h2>
-    <div id="route">順路を取得しています...</div>
-  </div>
+  <h1>ゼミ発表順路</h1>
+  <div id="route">順路を取得しています...</div>
 
-  <div class="section">
-    <h2>発表に投票</h2>
-    <div id="vote-buttons">
-      <!-- 発表番号に応じて自動生成 -->
-    </div>
-    <div id="message"></div>
-  </div>
-
-  <div class="section">
-    <h2>投票結果</h2>
-    <button onclick="loadResults()">結果を表示</button>
-    <div id="results"></div>
-  </div>
+  <h2>投票</h2>
+  <label>発表番号を選択：
+    <select id="vote-select">
+      <option value="1">1番</option>
+      <option value="2">2番</option>
+      <option value="3">3番</option>
+      <option value="4">4番</option>
+      <option value="5">5番</option>
+    </select>
+  </label>
+  <button id="vote-button">投票する</button>
 
   <script>
-    const apiBase = 'https://zemi-worker.u640186g.workers.dev';
+    const apiBase = "https://zemi-worker.u640186g.workers.dev";
 
     async function fetchRoute() {
       const res = await fetch(`${apiBase}/api/route`);
       const data = await res.json();
-      document.getElementById('route').textContent = 'あなたの順路：' + data.route.join(' → ');
-      generateVoteButtons(data.route.length);
+      document.getElementById("route").textContent = "あなたの順路：" + data.route.join(" → ");
     }
 
-    function generateVoteButtons(count) {
-      const container = document.getElementById('vote-buttons');
-      for (let i = 1; i <= count; i++) {
-        const btn = document.createElement('button');
-        btn.textContent = `発表${i}に投票`;
-        btn.onclick = () => vote(i);
-        container.appendChild(btn);
-      }
-    }
-
-    async function vote(num) {
+    async function vote() {
+      const num = parseInt(document.getElementById("vote-select").value);
       const res = await fetch(`${apiBase}/api/vote`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({ vote: num })
       });
-      const data = await res.json();
-      document.getElementById('message').textContent = data.success ? '投票が完了しました！' : '投票に失敗しました。';
-    }
 
-    async function loadResults() {
-      const res = await fetch(`${apiBase}/api/results`);
-      const data = await res.json();
-      const resultsDiv = document.getElementById('results');
-      resultsDiv.innerHTML = '';
-      for (const [num, count] of Object.entries(data.results)) {
-        const span = document.createElement('span');
-        span.textContent = `発表${num}：${count}票`;
-        resultsDiv.appendChild(span);
+      if (res.ok) {
+        alert("投票が完了しました！");
+      } else {
+        alert("投票に失敗しました");
       }
     }
+
+    document.getElementById("vote-button").onclick = vote;
 
     fetchRoute();
   </script>
